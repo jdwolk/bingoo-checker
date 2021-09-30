@@ -16,7 +16,10 @@ const {
 
 // constants
 const DB_NAME = "goobers_db";
-const GOOBERS_COLLECTION = "goobers";
+const DB_COLLECTIONS = {
+  goobers: "goobers",
+  owners: "owners"
+};
 const { ETH_PROVIDER_URL, NFT_CONTRACT, NFT_ABI_PATH } = process.env;
 const SLEEP_SECONDS = 1;
 const GOOBERS_PER_PAGE = 50;
@@ -86,11 +89,11 @@ const getNextGoobers = async ({ page, dbCollection }) => {
   await wait(SLEEP_SECONDS);
 };
 
-const run = async () => {
-  const db = await initDB({ dbName: DB_NAME });
-  const dbCollection = db.collection(GOOBERS_COLLECTION);
+const getGoobers = async ({ db }) => {
+  const collectionName = DB_COLLECTIONS.goobers
+  const dbCollection = db.collection(collectionName);
 
-  console.log(`Writing to '${GOOBERS_COLLECTION}' collection`);
+  console.log(`Adding goobers to '${collectionName}' db collection`);
 
   let page = 1;
   while (true) {
@@ -102,7 +105,14 @@ const run = async () => {
       break;
     }
   }
-  console.log("Done!");
+  console.log("Done getting goobers");
+}
+
+const run = async () => {
+  const db = await initDB({ dbName: DB_NAME });
+
+  await getGoobers({ db });
+
   await mongo.close();
 };
 
