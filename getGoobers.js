@@ -3,7 +3,7 @@ const Web3 = require("web3");
 const R = require("ramda");
 const { OpenSeaPort, Network } = require("opensea-js");
 
-const { withDB, DB_COLLECTIONS } = require('./db');
+const { withDB, DB_COLLECTIONS } = require("./db");
 
 // constants
 const { ETH_PROVIDER_URL, NFT_CONTRACT } = process.env;
@@ -124,7 +124,9 @@ const getGoobers = async ({ db }) => {
   while (true) {
     try {
       const { start, end } = makeRange({ page, perPage: GOOBERS_PER_PAGE });
-      if (start >= MAX_GOOBERS) { break }
+      if (start >= MAX_GOOBERS) {
+        break;
+      }
 
       console.log(`Adding goobers ${start}-${end}`);
       await writeNextGoobers({ page, db });

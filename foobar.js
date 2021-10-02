@@ -3,6 +3,8 @@ const parse = require("csv-parse");
 const fs = require("fs");
 
 const { withDB } = require("./db");
+const Regular = require("./regularBingooRules");
+const Mini = require("./miniBingooRules");
 const INPUT_DIR_SHOULD_BE_READ_FROM_CLI = "./testFiles";
 const THIS_SHOULD_BE_READ_FROM_CLI = require(`${INPUT_DIR_SHOULD_BE_READ_FROM_CLI}/bingoo1.json`);
 
@@ -34,19 +36,8 @@ const loadResponses = async ({ file }) => {
   return records;
 };
 
-const checkMini = async ({ db, response, winningTraits, winners }) => {
-  // TODO
-  return undefined;
-};
-
-const checkRegular = async ({ db, response, winningTraits, winners }) => {
-  console.log("Response: ", response);
-  return undefined;
-};
-
 const checkResponse = ({ rowType, ...rest }) => {
-  console.log("rowType: ", rowType);
-  return rowType === "regular" ? checkRegular(rest) : checkMini(rest);
+  return rowType === "regular" ? Regular.check(rest) : Mini.check(rest);
 };
 
 const findWinnerForRow = async ({ db, row }) => {
