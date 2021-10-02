@@ -1,0 +1,19 @@
+{
+  "title": "BINGOO Reveal #1",
+  "rows": {
+    "A1": {
+      "responsesCsv": "A1.csv",
+      "rowType": "regular",
+      "winningTraits": [
+        {
+        "trait_type": "bodyColor",
+        "value": "Yellow"
+        },
+        {
+          "trait_type": "brain",
+          "value": "Remote"
+        }
+      ]
+    }
+  }
+}
