@@ -1,6 +1,8 @@
 const R = require("ramda");
 const parse = require("csv-parse");
 const fs = require("fs");
+
+const { withDB } = require("./db");
 const INPUT_DIR_SHOULD_BE_READ_FROM_CLI = "./testFiles";
 const THIS_SHOULD_BE_READ_FROM_CLI = require(`${INPUT_DIR_SHOULD_BE_READ_FROM_CLI}/bingoo1.json`);
 
@@ -32,27 +34,42 @@ const loadResponses = async ({ file }) => {
   return records;
 };
 
-const foobar = async ({ config }) => {
+const findWinnerForRow = async ({ row }) => {
+  const { responsesCsv, rowType, winningTraits } = row;
+
+  // TODO: allow passing an aribtrary dir from CLI
+  const file = `./${INPUT_DIR_SHOULD_BE_READ_FROM_CLI}/${responsesCsv}`;
+
+  const responses = await loadResponses({ file });
+
+  console.log(row);
+  console.log(responses);
+
+  return "Joe Schmeagal";
+};
+
+const foobar = async ({ config, db }) => {
   const { title, rows } = config;
   console.log(`Finding BINGOO winners for ${title}`);
+  const rowPairs = R.toPairs(rows);
 
-  const results = await R.toPairs(rows).map(async ([rowName, row]) => {
-    const { responsesCsv, rowType, winningTraits } = row;
+  const rawResults = await Promise.all(
+    rowPairs.map(async ([rowName, row]) => {
+      const rowResult = await findWinnerForRow({ db, row });
+      return [rowName, rowResult];
+    })
+  );
 
-    // TODO: allow passing an aribtrary dir from CLI
-    const file = `./${INPUT_DIR_SHOULD_BE_READ_FROM_CLI}/${responsesCsv}`;
-
-    const responses = await loadResponses({ file });
-
-    console.log(row);
-    console.log(responses);
-  });
+  return R.fromPairs(rawResults);
 };
 
 const run = async () => {
   const config = THIS_SHOULD_BE_READ_FROM_CLI;
 
-  await foobar({ config });
+  withDB(async (db) => {
+    const results = await foobar({ config, db });
+    console.log(results);
+  });
 };
 
 module.exports = {
