@@ -34,7 +34,22 @@ const loadResponses = async ({ file }) => {
   return records;
 };
 
-const findWinnerForRow = async ({ row }) => {
+const checkMini = async ({ db, response, winningTraits, winners }) => {
+  // TODO
+  return undefined;
+};
+
+const checkRegular = async ({ db, response, winningTraits, winners }) => {
+  console.log("Response: ", response);
+  return undefined;
+};
+
+const checkResponse = ({ rowType, ...rest }) => {
+  console.log("rowType: ", rowType);
+  return rowType === "regular" ? checkRegular(rest) : checkMini(rest);
+};
+
+const findWinnerForRow = async ({ db, row }) => {
   const { responsesCsv, rowType, winningTraits } = row;
 
   // TODO: allow passing an aribtrary dir from CLI
@@ -42,10 +57,25 @@ const findWinnerForRow = async ({ row }) => {
 
   const responses = await loadResponses({ file });
 
-  console.log(row);
-  console.log(responses);
-
-  return "Joe Schmeagal";
+  return R.reduce(
+    async (winnersPromise, response) => {
+      const winners = await winnersPromise;
+      const newWinner = await checkResponse({
+        db,
+        response,
+        rowType,
+        winningTraits,
+        winners,
+      });
+      console.log("new winner: ", newWinner);
+      return {
+        ...winners,
+        ...(newWinner || {}),
+      };
+    },
+    {},
+    responses
+  );
 };
 
 const foobar = async ({ config, db }) => {
@@ -68,7 +98,7 @@ const run = async () => {
 
   withDB(async (db) => {
     const results = await foobar({ config, db });
-    console.log(results);
+    console.log("Results: ", results);
   });
 };
 
